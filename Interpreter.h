@@ -11,10 +11,11 @@ class Interpreter{
 struct cmd_line{
 	string header, instruction, operation;
 	int line_numb;
-	string get_header(){return header;}
+	//string get_header(){return header;}
 	string get_instruction(){return instruction;}
-	string get_operation(){return operation;}
-	int get_number(){return line_numb;}
+	//string get_operation(){return operation;}
+	//int get_number(){return line_numb;}
+	string ops[5];  //0=reg1 1=reg2 2=reg3 3= imediate 4=header
 };
 
 //cmd_line* program_code = new cmd_line[32];
@@ -24,18 +25,14 @@ struct cmd_line{
 		void parse_instructions(string cmd_name);
 		void print_code();
 		void run();
-		int if_control();
-		int id_control();
-		int ex1_control();
-		int ex2_control();
-		int ex3_control();
-		int mem_control();
-		int wb_control();
+		int buff_control(int pos);
+		int isDone();
+		void decode(cmd_line *line);
 
 		cmd_line cmd_lines[32];
 		int num_line;
 		int registers[32];
-
-		cmd_line * IF, * ID, * EX1, * EX2, * EX3, * MEM, * WB;
+		cmd_line reg_buff[7];//0=if 1=id 2=ex1 3=ex2 4=ex3 5=mem 6=wb
+		//cmd_line * IF, * ID, * EX1, * EX2, * EX3, * MEM, * WB;
 };
 #endif
