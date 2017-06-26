@@ -59,17 +59,16 @@ void Interpreter::print_code(){
 
 void Interpreter::run(){
 	int pc=0;
-	reg_buff[0]=cmd_lines[0];
-	while(isDone()){
-		buff_control(7);
-		buff_control(6);
-		buff_control(5);
-		buff_control(4);
-		buff_control(3);
-		buff_control(2);
-		buff_control(1);
-		pc++;
-		reg_buff[0]=cmd_lines[pc];
+	//reg_buff[0]=cmd_lines[0];
+	while(pc==0||isDone()){
+		buff_move(7);
+		buff_move(6);
+		buff_move(5);
+		buff_move(4);
+		buff_move(3);
+		buff_move(2);
+		id_control(1);
+		pc=if_control(pc);
 	}	
 }
 
@@ -84,7 +83,7 @@ int Interpreter::isDone(){
 	return result;
 }
 
-int Interpreter::buff_control(int pos){
+int Interpreter::buff_move(int pos){
 	if(pos==7)
 		reg_buff[6].line_numb=00;
 	if(reg_buff[pos].line_numb==00&&reg_buff[pos-1].line_numb!=00){
@@ -98,6 +97,41 @@ int Interpreter::buff_control(int pos){
 void Interpreter::decode(cmd_line *line){
 
 	if(line->instruction=="LI"){
+		line->ops[0]=line->operation.substr(0,2);
+		line->ops[3]=line->operation.substr(4);
+		cout<<line->instruction<<" "<<line->ops[0]<<" "<<line->ops[3]<<"\n";
+	}else if(line->instruction=="ADDI"||line->instruction=="SUBI"||line->instruction=="ANDI"||line->instruction=="ORI"||line->instruction=="BEQ"||line->instruction=="BNE"){
+		line->ops[0]=line->operation.substr(0,2);
+		line->ops[1]=line->operation.substr(4,2);
+		line->ops[3]=line->operation.substr(8);
+		cout<<line->instruction<<" "<<line->ops[0]<<" "<<line->ops[1]<<" "<<line->ops[3]<<"\n";
+	}else if(line->instruction=="LW"||line->instruction=="SW"){
+		line->ops[0]=line->operation.substr(0,2);
+		int temp=line->operation.find("(");
+		line->ops[3]=line->operation.substr(4,temp-4);
+		line->ops[1]=line->operation.substr(temp+1,2);
+		cout<<line->instruction<<" "<<line->ops[0]<<" "<<line->ops[3]<<" "<<line->ops[1]<<"\n";
+	}else if(line->instruction=="ADD"||line->instruction=="SUB"||line->instruction=="OR"||line->instruction=="AND"){
+		line->ops[0]=line->operation.substr(0,2);
+		line->ops[1]=line->operation.substr(4,2);
+		line->ops[2]=line->operation.substr(8);
+		cout<<line->instruction<<" "<<line->ops[0]<<" "<<line->ops[1]<<" "<<line->ops[2]<<"\n";
+	}else if(line->instruction=="J"){
+		line->ops[4]=line->operation;
+		cout<<line->instruction<<" "<<line->ops[4]<<"\n";
+	}
+}
 
+int Interpreter::if_control(int pc){
+	if(reg_buff[0].line_numb==00){
+		reg_buff[0]=cmd_lines[pc];
+		pc++;
+	}
+	return pc;
+}
+
+void Interpreter::id_control(int buf){
+	if(buff_move(buf)){
+		decode(&reg_buff[1]);
 	}
 }

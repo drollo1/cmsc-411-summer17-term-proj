@@ -25,9 +25,11 @@ struct cmd_line{
 		void parse_instructions(string cmd_name);
 		void print_code();
 		void run();
-		int buff_control(int pos);
+		int buff_move(int pos);
 		int isDone();
 		void decode(cmd_line *line);
+		int if_control(int pc);
+		void id_control(int buf);
 
 		cmd_line cmd_lines[32];
 		int num_line;
