@@ -25,8 +25,10 @@ struct cmd_line{
 		void build_data(string data_name);
 		void print_code();
 		void run();
+		int pop_instruction_cache(int pc, int cycle);
 		int buff_move(int pos);
 		int isDone();
+		int got_instruction(int pc);
 		void decode(cmd_line *line);
 		int if_control(int pc, int cycle);
 		void id_control(int cycle);
@@ -43,5 +45,6 @@ struct cmd_line{
 		string clock_cycles[32];
 		cmd_line reg_buff[7];//0=if 1=id 2=ex1 3=ex2 4=ex3 5=mem 6=wb
 		string memory_data[32];
+		cmd_line i_memory[2][8];
 };
 #endif

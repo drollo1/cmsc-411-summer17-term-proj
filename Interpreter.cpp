@@ -7,9 +7,12 @@ Interpreter::Interpreter(string cmd_name, string data_name ){
 	
 	for(int i=0;i<7;i++)
 		reg_buff[i].line_numb=00;
+	for(int i=0;i<2;i++)
+		for(int j=0;j<8;j++)
+			i_memory[i][j].line_numb=00;
 
 	parse_instructions(cmd_name);
-	//build_data(data_name);
+	build_data(data_name);
 	run();
 	print_code();
 } 
@@ -59,6 +62,7 @@ void Interpreter::build_data(string data_name){
 		memory_data[temp]=line;
 		temp++;
 	}
+	data_file.close();
 }
 
 void Interpreter::print_code(){
@@ -88,6 +92,8 @@ void Interpreter::run(){
 		ex2_control(cycle);
 		ex1_control(cycle);
 		id_control(cycle);
+		if(!got_instruction(pc))
+			cycle=pop_instruction_cache(pc, cycle);
 		pc=if_control(pc, cycle);
 		cycle++;
 	}	
@@ -104,11 +110,27 @@ int Interpreter::isDone(){
 	return result;
 }
 
-int Interpreter::buff_move(int pos){
-	if(pos==7){
-		reg_buff[6].line_numb=00;
+int Interpreter::got_instruction(int pc){
+	int block = (pc/8)%2;
+	int word = pc%8;
+	if(i_memory[block][word].line_numb==cmd_lines[pc].line_numb)
 		return 1;
-	}
+	else
+		return 0;
+}
+
+int Interpreter::pop_instruction_cache(int pc, int cycle){
+	int block = (pc/8)%2;
+	int word= (pc/8);
+	word = word*8;
+	cycle = cycle+24;
+	for(int i=0;i<8;i++)
+		i_memory[block][i]=cmd_lines[word+i];
+
+	return cycle;
+}
+
+int Interpreter::buff_move(int pos){
 	if(reg_buff[pos].line_numb==00&&reg_buff[pos-1].line_numb!=00){
 		reg_buff[pos]=reg_buff[pos-1];
 		reg_buff[pos-1].line_numb=00;
