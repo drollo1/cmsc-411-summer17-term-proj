@@ -7,6 +7,7 @@
 #include <fstream>
 #include <sstream>
 #include <ctype.h>
+#include <algorithm>
 
 using namespace std;
 
@@ -46,5 +47,9 @@ struct cmd_line{
 		cmd_line reg_buff[7];//0=if 1=id 2=ex1 3=ex2 4=ex3 5=mem 6=wb
 		string memory_data[32];
 		cmd_line i_memory[2][8];
+		int i_cache_acess;
+		int i_cache_misses;
+		int d_cache_acess;
+		int d_cache_misses;
 };
 #endif

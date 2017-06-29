@@ -79,24 +79,45 @@ void Interpreter::print_code(){
 			cout<<cmd_lines[i].operation<<"   \t";
 		cout<<clock_cycles[i]<<"\n";
 	}
+
+	cout<<"\nTotal number of access requests for instruction cache: ";
+	cout<<i_cache_acess<<"\n";
+	cout<<"Number of instruction cache hits: ";
+	cout<<i_cache_acess - i_cache_misses<<"\n\n";
+
+	cout<<"Total number of access requests for data cache: ";
+	cout<<d_cache_acess<<"\n";
+	cout<<"Number of data cache hits: ";
+	cout<<d_cache_acess - d_cache_misses<<"\n\n";
 }
 
 void Interpreter::run(){
 	int pc=0;
 	int cycle=0;
-	while(pc==0||isDone()){
-		clear_control(cycle);
-		wb_control(cycle);
-		mem_control(cycle);
-		ex3_control(cycle);
-		ex2_control(cycle);
-		ex1_control(cycle);
-		id_control(cycle);
-		if(!got_instruction(pc))
-			cycle=pop_instruction_cache(pc, cycle);
-		pc=if_control(pc, cycle);
-		cycle++;
-	}	
+	int pop_cycles;
+	do {
+		if(!got_instruction(pc)){
+			pop_cycles=pop_instruction_cache(pc, cycle);
+		}
+
+		do{
+			cycle++;
+			pop_cycles--;
+			clear_control(cycle);
+			wb_control(cycle);
+			mem_control(cycle);
+			ex3_control(cycle);
+			ex2_control(cycle);
+			ex1_control(cycle);
+			id_control(cycle);
+			pc=if_control(pc, cycle);
+			cout <<pop_cycles<<"\n";
+		} while (pop_cycles>0);
+		//cout<<"This is cycle "<<cycle<<" with a pc of "<<pc<<"\n";
+		//for(int i=0;i<7;i++)
+		//	cout<<"Register "<<i<<" has line number "<<reg_buff[i].line_numb<<"\n";
+
+	}while(pc==0||isDone());
 }
 
 int Interpreter::isDone(){
@@ -123,11 +144,11 @@ int Interpreter::pop_instruction_cache(int pc, int cycle){
 	int block = (pc/8)%2;
 	int word= (pc/8);
 	word = word*8;
-	cycle = cycle+24;
+	i_cache_misses++;
 	for(int i=0;i<8;i++)
 		i_memory[block][i]=cmd_lines[word+i];
 
-	return cycle;
+	return 24;
 }
 
 int Interpreter::buff_move(int pos){
@@ -168,9 +189,18 @@ void Interpreter::decode(cmd_line *line){
 }
 
 int Interpreter::if_control(int pc, int cycle){
-	if(reg_buff[0].line_numb==00){
-		reg_buff[0]=cmd_lines[pc];
+	int block= (pc/8)%2;
+	int word= pc%8;
+	if(reg_buff[0].line_numb==00&&i_memory[block][word].line_numb==(pc-1)){
+		int block = (pc/8)%2;
+		int word = pc%8;
+		reg_buff[0]=i_memory[block][word];
 		pc++;
+		i_cache_acess++;
+		stringstream ss;
+		ss << cycle;
+		clock_cycles[reg_buff[0].line_numb-1]+=ss.str();
+		clock_cycles[reg_buff[0].line_numb-1]+="\t";
 	}
 	return pc;
 }
@@ -226,10 +256,6 @@ void Interpreter::wb_control(int cycle){
 
 void Interpreter::clear_control(int cycle){
 	if(reg_buff[6].line_numb!=00){
-		stringstream ss;
-		ss << cycle;
-		clock_cycles[reg_buff[6].line_numb-1]+=ss.str();
-		clock_cycles[reg_buff[6].line_numb-1]+="\t";
 		reg_buff[6].line_numb=00;
 	}
 }
