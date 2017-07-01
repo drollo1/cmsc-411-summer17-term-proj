@@ -16,6 +16,7 @@ struct cmd_line{
 	string header, instruction, operation;
 	int line_numb;
 	string ops[5];  //0=reg1 1=reg2 2=reg3 3= imediate 4=header
+	int proc_done;
 };
 
 //cmd_line* program_code = new cmd_line[32];
@@ -28,7 +29,9 @@ struct cmd_line{
 		void run();
 		int pop_instruction_cache(int pc, int cycle);
 		int buff_move(int pos);
+		int pipe_line(int pc, int cycle, int pop_cycles);
 		int isDone();
+		int reg_empty();
 		int got_instruction(int pc);
 		void decode(cmd_line *line);
 		int if_control(int pc, int cycle);
@@ -47,6 +50,7 @@ struct cmd_line{
 		cmd_line reg_buff[7];//0=if 1=id 2=ex1 3=ex2 4=ex3 5=mem 6=wb
 		string memory_data[32];
 		cmd_line i_memory[2][8];
+		string d_memory[4][4];
 		int i_cache_acess;
 		int i_cache_misses;
 		int d_cache_acess;
