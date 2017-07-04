@@ -10,5 +10,6 @@ int main(int argc, char* argv[]) {
 	
 Interpreter interpreterer(argv[1], argv[2]);
 
+//cout<<"Program ended\n";
 	return EXIT_SUCCESS;
 }

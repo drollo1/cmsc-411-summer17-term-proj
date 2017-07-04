@@ -153,14 +153,14 @@ void Interpreter::run(){
 		else if(pop_d_cycles>0)
 			pop_d_cycles--;
 
-		cout<<"cycle "<<cycle<<" pc "<<pc<<":  ";
+		/*cout<<"cycle "<<cycle<<" pc "<<pc<<":  ";
 		for(int i=0;i<7;i++){
 			if(reg_buff[i].line_numb!=0)
 				cout<<reg_buff[i].instruction<<"\t";
 			else
 				cout<<"\t";
 		}
-		cout<<endl;
+		cout<<endl;*/
 		//cout<<"pop_cycles: "<<pop_cycles<<" pop_d_cycles: "<<pop_d_cycles<<"\n\n";
 	}
 	reg_buff[0].line_numb=0;
@@ -217,7 +217,7 @@ int Interpreter::pop_instruction_cache(int pc, int cycle){
 	int word= (pc/8);
 	word = word*8;
 	i_cache_misses++;
-	cout<<"Populating instructions "<<cycle<<endl;
+	//cout<<"Populating instructions "<<cycle<<endl;
 	for(int i=0;i<8;i++)
 		i_memory[block][i]=cmd_lines[word+i];
 
@@ -231,7 +231,7 @@ int Interpreter::pop_data_cache(){
 	int word=temp/4;
 	word=word*4;
 	d_cache_misses++;
-	cout<<"Populating data cache for "<<reg_buff[4].instruction<<endl;
+	//cout<<"Populating data cache for "<<reg_buff[4].instruction<<endl;
 	for(int i=0;i<4;i++){
 		d_memory[block][i].value=memory_data[word+i];
 		d_memory[block][i].address=(word+i);
@@ -283,9 +283,8 @@ void Interpreter::decode(cmd_line *line){
 int Interpreter::if_control(int pc, int cycle){
 	int block= (pc/8)%2;
 	int word= pc%8;
-	if(reg_buff[0].line_numb<0){
-		cout<<"Test"<<endl;
-		reg_buff[0].line_numb=00;
+	if(reg_buff[1].line_numb<0){
+		reg_buff[1].line_numb=00;
 	}
 	else if(reg_buff[0].line_numb==00&&i_memory[block][word].line_numb==(pc+1)){
 		int block = (pc/8)%2;
@@ -313,7 +312,6 @@ int Interpreter::ex1_control(int cycle, int pc){
 	
 	if((reg_buff[1].instruction.compare("BNE")==0||reg_buff[1].instruction.compare("BEQ")==0)&&reg_buff[1].line_numb!=00){
 		if(branch_forward()){
-
 			//cycle--;
 			stringstream ss;
 			ss << cycle;
@@ -433,7 +431,7 @@ void Interpreter::wb_control(int cycle){
 void Interpreter::clear_control(int cycle){
 	if(reg_buff[6].line_numb!=00){		
 		if(reg_buff[6].instruction.compare("SW")==0)
-			cout<<"This is where you write back"<<endl;
+			cout<<"";
 		else
 			reg_store(reg_buff[6].ops[0], reg_buff[6].solution);
 

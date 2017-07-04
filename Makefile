@@ -11,6 +11,8 @@ Interpreter:o Interpreter.cpp
 run: 
 	./Main.out inst.txt data.txt
 # -f removes any errors if the file is not present
+run2: 
+	./Main.out inst2.txt data.txt
 clean:
 	rm -rf *.o
 	rm -f Main.out
