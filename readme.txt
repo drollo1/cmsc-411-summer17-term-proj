@@ -1,0 +1,1 @@
+All you need to do is open the Makefile and change the file names under run.  After that you use "make" then "make run"
